@@ -1,12 +1,10 @@
 import json
 from typing import Any
-from urllib.parse import urlparse
 
 from fastapi import APIRouter
 from mcp.server.mcpserver import MCPServer
 from mcp.server.transport_security import TransportSecuritySettings
 
-from app.config import settings
 from app.database import AsyncSessionLocal
 from app.services.escrow import P2PPaymentService
 from app.services.negotiation import NegotiationService
@@ -24,11 +22,10 @@ mcp_server = MCPServer(
     version="1.2.0",
 )
 
-base_url = urlparse(settings.BASE_URL)
-transport_security = TransportSecuritySettings(
-    allowed_hosts=[base_url.netloc, "localhost", "127.0.0.1"],
-    allowed_origins=[settings.BASE_URL],
-)
+# DNS-rebinding protection targets locally-bound servers; this is a public HTTPS
+# API meant to be reached by external MCP clients/scanners (e.g. Smithery), so
+# host/origin allowlisting would otherwise reject them with 403/405.
+transport_security = TransportSecuritySettings(enable_dns_rebinding_protection=False)
 
 
 def _serialize_model(obj: Any) -> Any:
