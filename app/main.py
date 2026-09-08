@@ -67,3 +67,8 @@ async def disclaimer_page():
 @app.get("/skill.md", include_in_schema=False)
 async def skill_guide():
     return FileResponse(WEB_ROOT / "skill.md", media_type="text/markdown")
+
+@app.get("/.well-known/mcp/server-card.json", include_in_schema=False)
+async def mcp_server_card():
+    """Static metadata so scanners like Smithery can skip live discovery."""
+    return FileResponse(WEB_ROOT / ".well-known" / "mcp" / "server-card.json", media_type="application/json")
